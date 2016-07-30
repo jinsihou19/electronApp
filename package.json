@@ -2,20 +2,39 @@
   "name": "electron-app",
   "version": "1.0.0",
   "description": "electron-app",
-  "main": "index.js",
+  "main": "./src/index.js",
   "scripts": {
-    "start": "electron .",
+    "start": "electron --debug=5858 .",
     "package": "asar pack MyApp-darwin-x64/MyApp.app/Contents/Resources/app MyApp-darwin-x64/MyApp.app/Contents/Resources/app.asar",
-    "build": "electron-packager . MyApp --platform=darwin --arch=x64 --ignore=node_modules/electron-*"
+    "build": "electron-packager . MyApp --platform=darwin --arch=x64 --ignore=node_modules/electron-*",
+    "debug": "webpack --watch --config ./src/ui/webpack.config.dev.js --display-error-details"
   },
   "author": "jinsihou",
   "license": "MIT",
   "devDependencies": {
+    "babel": "^6.5.2",
+    "babel-core": "^6.11.4",
+    "babel-loader": "^6.2.4",
+    "babel-plugin-antd": "^0.4.1",
+    "babel-preset-es2015": "^6.9.0",
+    "babel-preset-react": "^6.11.1",
+    "css-loader": "^0.23.1",
+    "electron-packager": "^7.3.0",
+    "electron-prebuilt": "^1.1.2",
+    "extract-text-webpack-plugin": "^1.0.1",
+    "style-loader": "^0.13.1",
+    "webpack": "^1.13.1"
+  },
+  "dependencies": {
+    "antd": "^1.6.5",
     "echarts": "^3.1.10",
-    "electron-packager": "^7.0.2",
-    "electron-prebuilt": "^1.1.0",
-    "react": "^15.0.2",
+    "electron": "latest",
+    "menubar": "^4.1.1",
+    "moment": "^2.14.1",
+    "mongoose": "^4.5.0",
+    "qiniu": "^6.1.11",
+    "react": "^15.2.1",
     "react-desktop": "^0.2.0",
-    "react-dom": "^15.0.2"
+    "react-dom": "^15.2.1"
   }
 }

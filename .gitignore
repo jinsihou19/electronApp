@@ -1,6 +1,6 @@
-node_modules/*
-.vscode/*
-.idea/*
-lib/*
-MyApp-*/*
 *.map
+.idea/
+.vscode/
+MyApp-darwin-x64/
+lib/
+node_modules/
