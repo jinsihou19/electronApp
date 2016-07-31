@@ -87,7 +87,8 @@
 	    displayName: 'Demo',
 	    getInitialState: function getInitialState() {
 	        return {
-	            tableItems: []
+	            tableItems: [],
+	            collapse: true
 	        };
 	    },
 	    handleSubmit: function handleSubmit(e) {
@@ -101,6 +102,11 @@
 	        console.log('收到表单值：', this.props.form.getFieldsValue());
 	        ipcRenderer.send('login', Access_Key, Secret_Key);
 	    },
+	    onCollapseChange: function onCollapseChange() {
+	        this.setState({
+	            collapse: !this.state.collapse
+	        });
+	    },
 	
 	
 	    //e :{ eventKey, domEvent }
@@ -111,7 +117,9 @@
 	        });
 	    },
 	    render: function render() {
-	        var tableItems = this.state.tableItems;
+	        var _state = this.state;
+	        var tableItems = _state.tableItems;
+	        var collapse = _state.collapse;
 	
 	        return React.createElement(
 	            'div',
@@ -121,13 +129,13 @@
 	                { gutter: 16 },
 	                React.createElement(
 	                    _col2.default,
-	                    { className: 'gutter-row', span: 6 },
-	                    React.createElement(_sider2.default, { cbItems: this.handleGetItems })
+	                    { className: 'gutter-row', sm: 6, md: 4 },
+	                    React.createElement(_sider2.default, { cbItems: this.handleGetItems, collapse: collapse, onCollapseChange: this.onCollapseChange })
 	                ),
 	                React.createElement(
 	                    _col2.default,
-	                    { className: 'gutter-row', span: 18 },
-	                    React.createElement(_main2.default, { data: tableItems })
+	                    { className: 'gutter-row', sm: 18, md: 20 },
+	                    React.createElement(_main2.default, { data: tableItems, collapse: collapse })
 	                )
 	            )
 	        );
@@ -25134,31 +25142,45 @@
 	
 	var _react2 = _interopRequireDefault(_react);
 	
+	var _search = __webpack_require__(479);
+	
+	var _search2 = _interopRequireDefault(_search);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	var ipcRenderer = __webpack_require__(270).ipcRenderer; /**
-	                                                    * Created by vito on 16/7/30.
-	                                                    */
-	
+	/**
+	 * Created by vito on 16/7/30.
+	 */
+	var ipcRenderer = __webpack_require__(270).ipcRenderer;
 	
 	var Sider = _react2.default.createClass({
 	    displayName: 'Sider',
 	    getInitialState: function getInitialState() {
 	        return {
 	            current: '-1',
-	            buckets: []
+	            buckets: [],
+	            bucketsOnShow: []
 	        };
 	    },
 	    handleClick: function handleClick(e) {
 	        this.setState({
 	            current: e.key
 	        });
-	        var buckets = this.state.buckets;
+	        var bucketsOnShow = this.state.bucketsOnShow;
 	        var cbItems = this.props.cbItems;
 	
-	        ipcRenderer.send('list_file', buckets[e.key]);
+	        ipcRenderer.send('list_file', bucketsOnShow[e.key]);
 	        ipcRenderer.on('list_file-reply', function (err, ret) {
 	            cbItems(ret.items);
+	        });
+	    },
+	    handleFilter: function handleFilter(keyword) {
+	        var buckets = this.state.buckets;
+	
+	        this.setState({
+	            bucketsOnShow: buckets.filter(function (item) {
+	                return item.indexOf(keyword) !== -1;
+	            })
 	        });
 	    },
 	    componentDidMount: function componentDidMount() {
@@ -25167,26 +25189,31 @@
 	        ipcRenderer.send('buckets');
 	        ipcRenderer.on('buckets-reply', function (err, ret) {
 	            _this.setState({
-	                buckets: ret
+	                buckets: ret,
+	                bucketsOnShow: ret
 	            });
 	        });
 	    },
 	    render: function render() {
-	        var buckets = this.state.buckets;
+	        var bucketsOnShow = this.state.bucketsOnShow;
+	        var _props = this.props;
+	        var collapse = _props.collapse;
+	        var onCollapseChange = _props.onCollapseChange;
 	
 	        var subMenus = [];
-	        if (buckets) {
-	            subMenus = buckets.map(function (item, index) {
+	        if (bucketsOnShow) {
+	            subMenus = bucketsOnShow.map(function (item, index) {
 	                return _react2.default.createElement(
 	                    _menu2.default.Item,
 	                    { key: index },
 	                    _react2.default.createElement(
 	                        'span',
 	                        null,
-	                        _react2.default.createElement(_icon2.default, { type: 'appstore' }),
+	                        _react2.default.createElement(_icon2.default, { type: 'folder', className: 'menu-item-icon' }),
 	                        _react2.default.createElement(
 	                            'span',
-	                            null,
+	                            {
+	                                className: 'menu-item-text' },
 	                            item
 	                        )
 	                    )
@@ -25195,20 +25222,34 @@
 	        }
 	        return _react2.default.createElement(
 	            'div',
-	            { className: 'sider' },
+	            { className: collapse ? "sider-collapse" : "sider-fixed" },
+	            _react2.default.createElement(
+	                _menu2.default,
+	                { onClick: this.handleClick,
+	                    defaultOpenKeys: ['sub1'],
+	                    selectedKeys: [this.state.current],
+	                    mode: 'inline',
+	                    theme: 'dark'
+	                },
+	                _react2.default.createElement(
+	                    'div',
+	                    { className: 'menu-log' },
+	                    _react2.default.createElement('img', { src: 'dist/image/qiniu.png', className: 'logo-img' }),
+	                    _react2.default.createElement(
+	                        'div',
+	                        { className: 'logo-text' },
+	                        '空间'
+	                    )
+	                ),
+	                _react2.default.createElement(_search2.default, { placeholder: '输入关键词',
+	                    onSearch: this.handleFilter, style: collapse ? { width: 32 } : { width: 200 }
+	                }),
+	                subMenus
+	            ),
 	            _react2.default.createElement(
 	                'div',
-	                { className: 'sider-fixed' },
-	                _react2.default.createElement(
-	                    _menu2.default,
-	                    { onClick: this.handleClick,
-	                        defaultOpenKeys: ['sub1'],
-	                        selectedKeys: [this.state.current],
-	                        mode: 'inline',
-	                        theme: 'dark'
-	                    },
-	                    subMenus
-	                )
+	                { className: 'sider-action', onClick: onCollapseChange },
+	                collapse ? _react2.default.createElement(_icon2.default, { type: 'right' }) : _react2.default.createElement(_icon2.default, { type: 'left' })
 	            )
 	        );
 	    }
@@ -29292,6 +29333,7 @@
 	    title: '上传时间',
 	    dataIndex: 'putTime'
 	}];
+	var SRORE_UNIT = ['B', 'K', 'M', 'G', 'T'];
 	
 	var Main = _react2.default.createClass({
 	    displayName: 'Main',
@@ -29305,20 +29347,50 @@
 	        console.log('selectedRowKeys changed: ', selectedRowKeys);
 	        this.setState({ selectedRowKeys: selectedRowKeys });
 	    },
+	
+	    componentWillReceiveProps: function componentWillReceiveProps(nextProps) {
+	        this.setState({
+	            selectedRowKeys: [], // 这里配置默认勾选列
+	            loading: false
+	        });
+	    },
+	
+	    solveSize: function solveSize(size) {
+	        for (var i = 1; size > 1024; i++) {
+	            size = size / 1024;
+	            if (size < 1024) {
+	                return size.toFixed(2) + SRORE_UNIT[i];
+	            }
+	        }
+	        return size + SRORE_UNIT[0];
+	    },
 	    render: function render() {
-	        var data = this.props.data;
+	        var _props = this.props;
+	        var data = _props.data;
+	        var collapse = _props.collapse;
 	        var _state = this.state;
 	        var loading = _state.loading;
 	        var selectedRowKeys = _state.selectedRowKeys;
 	
+	        var that = this;
 	        var rowSelection = {
 	            selectedRowKeys: selectedRowKeys,
 	            onChange: this.onSelectChange
 	        };
 	        var hasSelected = selectedRowKeys.length > 0;
+	        var pagination = {
+	            total: data.length,
+	            showSizeChanger: true,
+	            onShowSizeChange: function onShowSizeChange(current, pageSize) {
+	                console.log('Current: ', current, '; PageSize: ', pageSize);
+	            },
+	            onChange: function onChange(current) {
+	                console.log('Current: ', current);
+	            }
+	        };
 	        return _react2.default.createElement(
 	            'div',
-	            { className: 'sider' },
+	            { className: collapse ? "main-collapse" : "main" },
 	            _react2.default.createElement(
 	                'div',
 	                { style: { marginBottom: 16 } },
@@ -29336,12 +29408,14 @@
 	                )
 	            ),
 	            _react2.default.createElement(_table2.default, { rowSelection: rowSelection, columns: columns,
+	                pagination: pagination,
 	                dataSource: data.map(function (item) {
 	                    return Object.assign({}, item, {
-	                        fsize: item.fsize / 1000 + 'k',
+	                        fsize: that.solveSize(item.fsize),
 	                        putTime: (0, _moment2.default)(new Date(item.putTime / 10000)).format('YYYY-MM-DD hh:mm:ss')
 	                    });
-	                }) })
+	                })
+	            })
 	        );
 	    }
 	});
@@ -53611,6 +53685,511 @@
 	    return zh_tw;
 	
 	}));
+
+/***/ },
+/* 479 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _css = __webpack_require__(284);
+	
+	var _button = __webpack_require__(348);
+	
+	var _button2 = _interopRequireDefault(_button);
+	
+	var _css2 = __webpack_require__(296);
+	
+	var _input = __webpack_require__(480);
+	
+	var _input2 = _interopRequireDefault(_input);
+	
+	var _react = __webpack_require__(13);
+	
+	var _react2 = _interopRequireDefault(_react);
+	
+	var _classnames = __webpack_require__(44);
+	
+	var _classnames2 = _interopRequireDefault(_classnames);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	/**
+	 * Created by vito on 16/7/31.
+	 */
+	var InputGroup = _input2.default.Group;
+	
+	var SearchInput = _react2.default.createClass({
+	    displayName: 'SearchInput',
+	    getInitialState: function getInitialState() {
+	        return {
+	            value: '',
+	            focus: false
+	        };
+	    },
+	    handleInputChange: function handleInputChange(e) {
+	        this.setState({
+	            value: e.target.value
+	        });
+	        if (this.props.onSearch) {
+	            this.props.onSearch(e.target.value);
+	        }
+	    },
+	    handleFocusBlur: function handleFocusBlur(e) {
+	        this.setState({
+	            focus: e.target === document.activeElement
+	        });
+	    },
+	    handleSearch: function handleSearch() {
+	        if (this.props.onSearch) {
+	            this.props.onSearch(this.state.value);
+	        }
+	    },
+	    render: function render() {
+	        var _props = this.props;
+	        var style = _props.style;
+	        var size = _props.size;
+	        var placeholder = _props.placeholder;
+	
+	        var btnCls = (0, _classnames2.default)({
+	            'ant-search-btn': true,
+	            'ant-search-btn-noempty': !!this.state.value.trim()
+	        });
+	        var searchCls = (0, _classnames2.default)({
+	            'ant-search-input': true,
+	            'ant-search-input-focus': this.state.focus
+	        });
+	        return _react2.default.createElement(
+	            'div',
+	            { className: 'ant-search-input-wrapper', style: style },
+	            _react2.default.createElement(
+	                InputGroup,
+	                { className: searchCls },
+	                _react2.default.createElement(_input2.default, { className: 'menu-search-input', placeholder: placeholder, value: this.state.value, onChange: this.handleInputChange,
+	                    onFocus: this.handleFocusBlur, onBlur: this.handleFocusBlur, onPressEnter: this.handleSearch
+	                }),
+	                _react2.default.createElement(
+	                    'div',
+	                    { className: 'ant-input-group-wrap' },
+	                    _react2.default.createElement(_button2.default, { icon: 'search', className: btnCls, size: size, onClick: this.handleSearch })
+	                )
+	            )
+	        );
+	    }
+	});
+	
+	exports.default = SearchInput;
+
+/***/ },
+/* 480 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _Input = __webpack_require__(481);
+	
+	var _Input2 = _interopRequireDefault(_Input);
+	
+	var _Group = __webpack_require__(483);
+	
+	var _Group2 = _interopRequireDefault(_Group);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+	
+	_Input2["default"].Group = _Group2["default"];
+	exports["default"] = _Input2["default"];
+	module.exports = exports['default'];
+
+/***/ },
+/* 481 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports["default"] = undefined;
+	
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+	
+	var _class, _temp;
+	
+	var _react = __webpack_require__(13);
+	
+	var _react2 = _interopRequireDefault(_react);
+	
+	var _classnames = __webpack_require__(44);
+	
+	var _classnames2 = _interopRequireDefault(_classnames);
+	
+	var _calculateNodeHeight = __webpack_require__(482);
+	
+	var _calculateNodeHeight2 = _interopRequireDefault(_calculateNodeHeight);
+	
+	var _object = __webpack_require__(49);
+	
+	var _object2 = _interopRequireDefault(_object);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+	
+	function _defaults(obj, defaults) { var keys = Object.getOwnPropertyNames(defaults); for (var i = 0; i < keys.length; i++) { var key = keys[i]; var value = Object.getOwnPropertyDescriptor(defaults, key); if (value && value.configurable && obj[key] === undefined) { Object.defineProperty(obj, key, value); } } return obj; }
+	
+	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : _defaults(subClass, superClass); }
+	
+	function fixControlledValue(value) {
+	  if (typeof value === 'undefined' || value === null) {
+	    return '';
+	  }
+	  return value;
+	}
+	
+	function onNextFrame(cb) {
+	  if (window.requestAnimationFrame) {
+	    return window.requestAnimationFrame(cb);
+	  }
+	  return window.setTimeout(cb, 1);
+	}
+	
+	function clearNextFrameAction(nextFrameId) {
+	  if (window.cancelAnimationFrame) {
+	    window.cancelAnimationFrame(nextFrameId);
+	  } else {
+	    window.clearTimeout(nextFrameId);
+	  }
+	}
+	
+	var Input = (_temp = _class = function (_Component) {
+	  _inherits(Input, _Component);
+	
+	  function Input(props) {
+	    _classCallCheck(this, Input);
+	
+	    var _this = _possibleConstructorReturn(this, _Component.call(this, props));
+	
+	    _this.handleKeyDown = function (e) {
+	      if (e.keyCode === 13) {
+	        _this.props.onPressEnter(e);
+	      }
+	      _this.props.onKeyDown(e);
+	    };
+	
+	    _this.handleTextareaChange = function (e) {
+	      _this.resizeTextarea();
+	      if (_this.props.onChange) {
+	        _this.props.onChange(e);
+	      }
+	    };
+	
+	    _this.resizeTextarea = function () {
+	      var _this$props = _this.props;
+	      var type = _this$props.type;
+	      var autosize = _this$props.autosize;
+	
+	      if (type !== 'textarea' || !autosize || !_this.refs.input) {
+	        return;
+	      }
+	      var minRows = autosize ? autosize.minRows : null;
+	      var maxRows = autosize ? autosize.maxRows : null;
+	      var textareaStyles = (0, _calculateNodeHeight2["default"])(_this.refs.input, false, minRows, maxRows);
+	      _this.setState({ textareaStyles: textareaStyles });
+	    };
+	
+	    _this.state = {
+	      textareaStyles: null
+	    };
+	    return _this;
+	  }
+	
+	  Input.prototype.componentDidMount = function componentDidMount() {
+	    this.resizeTextarea();
+	  };
+	
+	  Input.prototype.componentWillReceiveProps = function componentWillReceiveProps(nextProps) {
+	    // Re-render with the new content then recalculate the height as required.
+	    if (this.props.value !== nextProps.value) {
+	      if (this.nextFrameActionId) {
+	        clearNextFrameAction(this.nextFrameActionId);
+	      }
+	      this.nextFrameActionId = onNextFrame(this.resizeTextarea);
+	    }
+	  };
+	
+	  Input.prototype.renderLabledInput = function renderLabledInput(children) {
+	    var _classNames;
+	
+	    var props = this.props;
+	    var wrapperClassName = props.prefixCls + '-group';
+	    var addonClassName = wrapperClassName + '-addon';
+	    var addonBefore = props.addonBefore ? _react2["default"].createElement(
+	      'span',
+	      { className: addonClassName },
+	      props.addonBefore
+	    ) : null;
+	
+	    var addonAfter = props.addonAfter ? _react2["default"].createElement(
+	      'span',
+	      { className: addonClassName },
+	      props.addonAfter
+	    ) : null;
+	
+	    var className = (0, _classnames2["default"])((_classNames = {}, _defineProperty(_classNames, props.prefixCls + '-wrapper', true), _defineProperty(_classNames, wrapperClassName, addonBefore || addonAfter), _classNames));
+	
+	    return _react2["default"].createElement(
+	      'span',
+	      { className: className },
+	      addonBefore,
+	      children,
+	      addonAfter
+	    );
+	  };
+	
+	  Input.prototype.renderInput = function renderInput() {
+	    var _classNames2;
+	
+	    var props = _extends({}, this.props);
+	
+	    // Fix https://fb.me/react-unknown-prop
+	    var otherProps = (0, _object2["default"])(this.props, ['prefixCls', 'onPressEnter', 'autosize', 'addonBefore', 'addonAfter']);
+	
+	    var prefixCls = props.prefixCls;
+	    if (!props.type) {
+	      return props.children;
+	    }
+	
+	    var inputClassName = (0, _classnames2["default"])((_classNames2 = {}, _defineProperty(_classNames2, prefixCls, true), _defineProperty(_classNames2, prefixCls + '-sm', props.size === 'small'), _defineProperty(_classNames2, prefixCls + '-lg', props.size === 'large'), _defineProperty(_classNames2, props.className, !!props.className), _classNames2));
+	
+	    if ('value' in props) {
+	      otherProps.value = fixControlledValue(props.value);
+	      // Input elements must be either controlled or uncontrolled,
+	      // specify either the value prop, or the defaultValue prop, but not both.
+	      delete otherProps.defaultValue;
+	    }
+	
+	    switch (props.type) {
+	      case 'textarea':
+	        return _react2["default"].createElement('textarea', _extends({}, otherProps, {
+	          style: _extends({}, props.style, this.state.textareaStyles),
+	          className: inputClassName,
+	          onKeyDown: this.handleKeyDown,
+	          onChange: this.handleTextareaChange,
+	          ref: 'input'
+	        }));
+	      default:
+	        return _react2["default"].createElement('input', _extends({}, otherProps, {
+	          className: inputClassName,
+	          onKeyDown: this.handleKeyDown,
+	          ref: 'input'
+	        }));
+	    }
+	  };
+	
+	  Input.prototype.render = function render() {
+	    return this.renderLabledInput(this.renderInput());
+	  };
+	
+	  return Input;
+	}(_react.Component), _class.defaultProps = {
+	  defaultValue: '',
+	  disabled: false,
+	  prefixCls: 'ant-input',
+	  type: 'text',
+	  onPressEnter: function onPressEnter() {},
+	  onKeyDown: function onKeyDown() {},
+	
+	  autosize: false
+	}, _class.propTypes = {
+	  type: _react.PropTypes.string,
+	  id: _react.PropTypes.oneOfType([_react.PropTypes.string, _react.PropTypes.number]),
+	  size: _react.PropTypes.oneOf(['small', 'default', 'large']),
+	  disabled: _react.PropTypes.bool,
+	  value: _react.PropTypes.any,
+	  defaultValue: _react.PropTypes.any,
+	  className: _react.PropTypes.string,
+	  addonBefore: _react.PropTypes.node,
+	  addonAfter: _react.PropTypes.node,
+	  prefixCls: _react.PropTypes.string,
+	  autosize: _react.PropTypes.oneOfType([_react.PropTypes.bool, _react.PropTypes.object]),
+	  onPressEnter: _react.PropTypes.func,
+	  onKeyDown: _react.PropTypes.func
+	}, _temp);
+	exports["default"] = Input;
+	module.exports = exports['default'];
+
+/***/ },
+/* 482 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports["default"] = calculateNodeHeight;
+	// Thanks to https://github.com/andreypopp/react-textarea-autosize/
+	
+	/**
+	 * calculateNodeHeight(uiTextNode, useCache = false)
+	 */
+	
+	var HIDDEN_TEXTAREA_STYLE = '\n  min-height:0 !important;\n  max-height:none !important;\n  height:0 !important;\n  visibility:hidden !important;\n  overflow:hidden !important;\n  position:absolute !important;\n  z-index:-1000 !important;\n  top:0 !important;\n  right:0 !important\n';
+	
+	var SIZING_STYLE = ['letter-spacing', 'line-height', 'padding-top', 'padding-bottom', 'font-family', 'font-weight', 'font-size', 'text-rendering', 'text-transform', 'width', 'text-indent', 'padding-left', 'padding-right', 'border-width', 'box-sizing'];
+	
+	var computedStyleCache = {};
+	var hiddenTextarea = void 0;
+	
+	function calculateNodeStyling(node) {
+	  var useCache = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
+	
+	  var nodeRef = node.getAttribute('id') || node.getAttribute('data-reactid') || node.getAttribute('name');
+	
+	  if (useCache && computedStyleCache[nodeRef]) {
+	    return computedStyleCache[nodeRef];
+	  }
+	
+	  var style = window.getComputedStyle(node);
+	
+	  var boxSizing = style.getPropertyValue('box-sizing') || style.getPropertyValue('-moz-box-sizing') || style.getPropertyValue('-webkit-box-sizing');
+	
+	  var paddingSize = parseFloat(style.getPropertyValue('padding-bottom')) + parseFloat(style.getPropertyValue('padding-top'));
+	
+	  var borderSize = parseFloat(style.getPropertyValue('border-bottom-width')) + parseFloat(style.getPropertyValue('border-top-width'));
+	
+	  var sizingStyle = SIZING_STYLE.map(function (name) {
+	    return name + ':' + style.getPropertyValue(name);
+	  }).join(';');
+	
+	  var nodeInfo = {
+	    sizingStyle: sizingStyle,
+	    paddingSize: paddingSize,
+	    borderSize: borderSize,
+	    boxSizing: boxSizing
+	  };
+	
+	  if (useCache && nodeRef) {
+	    computedStyleCache[nodeRef] = nodeInfo;
+	  }
+	
+	  return nodeInfo;
+	}
+	
+	function calculateNodeHeight(uiTextNode) {
+	  var useCache = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
+	  var minRows = arguments.length <= 2 || arguments[2] === undefined ? null : arguments[2];
+	  var maxRows = arguments.length <= 3 || arguments[3] === undefined ? null : arguments[3];
+	
+	  if (!hiddenTextarea) {
+	    hiddenTextarea = document.createElement('textarea');
+	    document.body.appendChild(hiddenTextarea);
+	  }
+	
+	  // Copy all CSS properties that have an impact on the height of the content in
+	  // the textbox
+	
+	  var _calculateNodeStyling = calculateNodeStyling(uiTextNode, useCache);
+	
+	  var paddingSize = _calculateNodeStyling.paddingSize;
+	  var borderSize = _calculateNodeStyling.borderSize;
+	  var boxSizing = _calculateNodeStyling.boxSizing;
+	  var sizingStyle = _calculateNodeStyling.sizingStyle;
+	
+	  // Need to have the overflow attribute to hide the scrollbar otherwise
+	  // text-lines will not calculated properly as the shadow will technically be
+	  // narrower for content
+	
+	  hiddenTextarea.setAttribute('style', sizingStyle + ';' + HIDDEN_TEXTAREA_STYLE);
+	  hiddenTextarea.value = uiTextNode.value || uiTextNode.placeholder || '';
+	
+	  var minHeight = -Infinity;
+	  var maxHeight = Infinity;
+	  var height = hiddenTextarea.scrollHeight;
+	
+	  if (boxSizing === 'border-box') {
+	    // border-box: add border, since height = content + padding + border
+	    height = height + borderSize;
+	  } else if (boxSizing === 'content-box') {
+	    // remove padding, since height = content
+	    height = height - paddingSize;
+	  }
+	
+	  if (minRows !== null || maxRows !== null) {
+	    // measure height of a textarea with a single row
+	    hiddenTextarea.value = '';
+	    var singleRowHeight = hiddenTextarea.scrollHeight - paddingSize;
+	    if (minRows !== null) {
+	      minHeight = singleRowHeight * minRows;
+	      if (boxSizing === 'border-box') {
+	        minHeight = minHeight + paddingSize + borderSize;
+	      }
+	      height = Math.max(minHeight, height);
+	    }
+	    if (maxRows !== null) {
+	      maxHeight = singleRowHeight * maxRows;
+	      if (boxSizing === 'border-box') {
+	        maxHeight = maxHeight + paddingSize + borderSize;
+	      }
+	      height = Math.min(maxHeight, height);
+	    }
+	  }
+	  return { height: height, minHeight: minHeight, maxHeight: maxHeight };
+	}
+	module.exports = exports['default'];
+
+/***/ },
+/* 483 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports["default"] = Group;
+	
+	var _react = __webpack_require__(13);
+	
+	var _react2 = _interopRequireDefault(_react);
+	
+	var _classnames = __webpack_require__(44);
+	
+	var _classnames2 = _interopRequireDefault(_classnames);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+	
+	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+	
+	function Group(props) {
+	  var className = (0, _classnames2["default"])(_defineProperty({
+	    'ant-input-group': true,
+	    'ant-input-group-lg': props.size === 'large',
+	    'ant-input-group-sm': props.size === 'small'
+	  }, props.className, !!props.className));
+	  return _react2["default"].createElement(
+	    'span',
+	    { className: className, style: props.style },
+	    props.children
+	  );
+	}
+	
+	Group.propTypes = {
+	  children: _react2["default"].PropTypes.any
+	};
+	module.exports = exports['default'];
 
 /***/ }
 /******/ ]);

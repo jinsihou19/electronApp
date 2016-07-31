@@ -13,7 +13,8 @@ import Main from './components/main';
 let Demo = React.createClass({
     getInitialState() {
         return {
-            tableItems: []
+            tableItems: [],
+            collapse: true,
         };
     },
     handleSubmit(e) {
@@ -21,6 +22,12 @@ let Demo = React.createClass({
         let {Access_Key, Secret_Key} = this.props.form.getFieldsValue();
         console.log('收到表单值：', this.props.form.getFieldsValue());
         ipcRenderer.send('login', Access_Key, Secret_Key);
+    },
+
+    onCollapseChange() {
+        this.setState({
+            collapse: !this.state.collapse,
+        })
     },
 
     //e :{ eventKey, domEvent }
@@ -32,15 +39,15 @@ let Demo = React.createClass({
     },
 
     render() {
-        let {tableItems} = this.state;
+        let {tableItems, collapse} = this.state;
         return (
             <div className="gutter-example">
                 <Row gutter={16}>
-                    <Col className="gutter-row" span={6}>
-                        <Sider cbItems={this.handleGetItems}/>
+                    <Col className="gutter-row" sm={6} md={4}>
+                        <Sider cbItems={this.handleGetItems} collapse={collapse} onCollapseChange={this.onCollapseChange}/>
                     </Col>
-                    <Col className="gutter-row" span={18}>
-                        <Main data={tableItems}/>
+                    <Col className="gutter-row" sm={18} md={20}>
+                        <Main data={tableItems} collapse={collapse}/>
                     </Col>
                 </Row>
             </div>

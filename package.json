@@ -27,6 +27,7 @@
   },
   "dependencies": {
     "antd": "^1.6.5",
+    "classnames": "^2.2.5",
     "echarts": "^3.1.10",
     "electron": "latest",
     "menubar": "^4.1.1",

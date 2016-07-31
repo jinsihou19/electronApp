@@ -10,16 +10,110 @@
 
 .sider {
     position: relative;
-    padding-bottom: 24px;
     min-height: 100%;
 }
-.sider-fixed{
+
+.sider-fixed {
     position: fixed;
-    width: 25%;
-    max-width: 225px;
+    width: 224px;
     background: #404040;
     overflow-y: scroll;
-    top:0;
+    top: 0;
     left: 0;
     bottom: 0;
+    z-index: 10;
+    transition: all 0.3s ease;
+    .menu-item-icon {
+        transition: font-size 0.3s;
+    }
+    .sider-action {
+        z-index: 10;
+        height: 42px;
+        width: 224px;
+        position: fixed;
+        bottom: 0;
+        background: #656565;
+        opacity: 0.8;
+        color: #fff;
+        text-align: center;
+        line-height: 42px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    .menu-log {
+        position: relative;
+        .logo-img {
+            width: 32px;
+            margin: 16px 24px 16px 28px;
+            transition: all 0.3s ease;
+        }
+        .logo-text {
+            position: absolute;
+            left: 84px;
+            top: 10px;
+            font-size: 20px;
+            transition: all 0.3s ease;
+        }
+    }
+    .ant-search-input {
+        margin: 16px 12px 16px 12px;
+        background: #404040;
+    }
+}
+
+.sider-collapse {
+    @extend .sider-fixed;
+    width: 64px;
+    .menu-item-text, .menu-search-input {
+        display: none;
+    }
+    .menu-item-icon {
+        font-size: 16px;
+    }
+    .ant-menu > .ant-menu-item {
+        &:hover {
+            background: #2db7f5;
+            color: #fff;
+            transition: all 0s ease;
+        }
+    }
+    .sider-action {
+        width: 64px;
+        transition: all 0.3s ease;
+    }
+    .menu-log {
+        position: relative;
+        .logo-img {
+            margin: 16px;
+        }
+        .logo-text {
+            display: none;
+        }
+    }
+    .ant-search-input {
+        margin: 16px;
+        .ant-search-btn {
+            color: #999;
+            background: #404040;
+            border-radius: 5px;
+            border-left-width: 0;
+            transition: all 0s ease;
+        }
+    }
+}
+
+.main {
+    position: fixed;
+    overflow-y: scroll;
+    margin: 10px;
+    top: 0;
+    left: 224px;
+    bottom: 0;
+    right: 0;
+    transition: all 0.3s ease;
+}
+
+.main-collapse {
+    @extend .main;
+    left: 64px;
 }
