@@ -57,4 +57,4 @@ let Demo = React.createClass({
 
 Demo = Form.create()(Demo);
 let mountNode = document.getElementById('main');
-ReactDOM.render(<Demo />, mountNode);
+ReactDOM.render(<Demo/>, mountNode);
