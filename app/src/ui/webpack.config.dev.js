@@ -6,10 +6,14 @@ module.exports = {
     target: 'electron',
     devtool: 'source-map',
     entry: {
-        'index': './src/ui/index.js',
+        'index': './src/ui/index.tsx',
         // 'react': ['react', 'react-dom'],
-        // 'third': ['react-router', 'react-redux', 'redux', 'isomorphic-fetch', 'object-assign', 'marked', 'moment', 'scroll-behavior', 'classnames'],
-        // 'i18n': ['./shop/js/components/other/i18n']
+        // 'third': ['react-router', 'react-redux', 'redux', 'isomorphic-fetch', 'object-assign', 'marked', 'moment',
+        // 'scroll-behavior', 'classnames'], 'i18n': ['./shop/js/components/other/i18n']
+    },
+    resolve: {
+        // Add '.ts' and '.tsx' as resolvable extensions.
+        extensions: ["", ".webpack.js", ".web.js", ".ts", ".tsx", ".js"]
     },
     output: {
         path: __dirname + "/dist",
@@ -32,26 +36,34 @@ module.exports = {
     module: {
         loaders: [
             {
+                test: /\.tsx?$/,
+                loader: "babel?presets[]=react,presets[]=es2015!ts-loader"
+            },
+            {
                 test: /\.js$/,
                 exclude: /node_modules/,
                 loader: "babel?presets[]=react,presets[]=es2015"
             },
-            // {
-            //     test: /\.html$/,
-            //     loader: "file?name=[name].[ext]"
-            // },
-            // {
-            //     test: /\.png$/,
-            //     loader: "url-loader?limit=10000"
-            // },
+            {
+                test: /\.html$/,
+                loader: "file?name=[name].[ext]"
+            },
+            {
+                test: /\.png$/,
+                loader: "url-loader?limit=10000"
+            },
             {
                 test: /\.css$/,
                 loader: ExtractTextPlugin.extract('style', 'css?sourceMap')
             },
-            // {
-            //     test: /\.scss$/,
-            //     loader: ExtractTextPlugin.extract('style', "css?sourceMap!autoprefixer!sass")
-            // }
+            {
+                test: /\.scss$/,
+                loader: ExtractTextPlugin.extract('style', "css?sourceMap!autoprefixer!sass")
+            },
+        ],
+        preLoaders: [
+            // All output '.js' files will have any sourcemaps re-processed by 'source-map-loader'.
+            { test: /\.js$/, loader: "source-map-loader" }
         ]
     },
     "babel": {

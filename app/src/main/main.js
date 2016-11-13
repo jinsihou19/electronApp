@@ -8,20 +8,22 @@ app.on('ready', function () {
         width: 800,
         height: 600
     });
-    mainWindow.on('closed', function () {
+    mainWindow.on('closed', ()=> {
         mainWindow = null;
     });
     mainWindow.closeDevTools();
-    mainWindow.loadURL('file://' + __dirname + '/ui/index.html');
-    ipcMain.on('openPrefs', function () {
+    mainWindow.loadURL('file://' + __dirname + '/../ui/index.html');
+    ipcMain.on('openPrefs', ()=> {
         var prefsWindow = new BrowserWindow({
             width: 400,
             height: 400
         });
         prefsWindow.setAlwaysOnTop(true);
-        prefsWindow.loadURL('file://' + __dirname + '/main/prefs.html');
+        prefsWindow.loadURL('file://' + __dirname + '/prefs.html');
     });
     subscribers.subscribers();
 });
-
+app.on('window-all-closed', ()=> {
+    app.quit()
+});
 

@@ -15,33 +15,31 @@
   ],
   "homepage": "http://github.jinsihou19.io",
   "devDependencies": {
+    "electron": "^1.4.5",
     "electron-builder": "latest",
-    "electron-prebuilt": "latest"
+    "electron-packager": "^8.2.0",
+    "electron-prebuilt": "latest",
+    "electron-rebuild": "^1.1.5"
   },
   "build": {
-    "win": {
-      "iconUrl": "(windows-only) https link to icon"
-    },
-    "dmg": {
-      "title": "QiniuClient",
-      "background": "build/background.png",
-      "icon": "build/icon.icns",
-      "icon-size": 128,
-      "appId": "jinsihou.qiniu",
-      "app-category-type": "public.app-category.productivity",
-      "contents": [
-        {
-          "x": 355,
-          "y": 125,
-          "type": "link",
-          "path": "/Applications"
-        },
-        {
-          "x": 155,
-          "y": 125,
-          "type": "file"
-        }
-      ]
-    }
+    "title": "QiniuClient",
+    "background": "build/background.png",
+    "icon": "build/icon.icns",
+    "icon-size": 128,
+    "appId": "jinsihou.qiniu",
+    "app-category-type": "public.app-category.productivity",
+    "contents": [
+      {
+        "x": 355,
+        "y": 125,
+        "type": "link",
+        "path": "/Applications"
+      },
+      {
+        "x": 155,
+        "y": 125,
+        "type": "file"
+      }
+    ]
   }
 }
