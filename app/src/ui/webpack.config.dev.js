@@ -7,9 +7,6 @@ module.exports = {
     devtool: 'source-map',
     entry: {
         'index': './src/ui/index.tsx',
-        // 'react': ['react', 'react-dom'],
-        // 'third': ['react-router', 'react-redux', 'redux', 'isomorphic-fetch', 'object-assign', 'marked', 'moment',
-        // 'scroll-behavior', 'classnames'], 'i18n': ['./shop/js/components/other/i18n']
     },
     resolve: {
         // Add '.ts' and '.tsx' as resolvable extensions.
@@ -27,10 +24,10 @@ module.exports = {
         }),
         // //提取公共的模块作为单独文件
         // new webpack.optimize.CommonsChunkPlugin({
-        //     name: ['react', 'third', 'i18n'],
+        //     name: ['lib'],
         //     minChunks: Infinity
         // }),
-        // //生成独立的css文件
+        //生成独立的css文件
         new ExtractTextPlugin('[name].min.css')
     ],
     module: {
@@ -63,7 +60,7 @@ module.exports = {
         ],
         preLoaders: [
             // All output '.js' files will have any sourcemaps re-processed by 'source-map-loader'.
-            { test: /\.js$/, loader: "source-map-loader" }
+            {test: /\.js$/, loader: "source-map-loader"}
         ]
     },
     "babel": {

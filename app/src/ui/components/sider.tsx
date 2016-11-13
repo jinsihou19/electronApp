@@ -10,7 +10,8 @@ import SearchInput from "./search";
 const ipcRenderer = Electron.ipcRenderer;
 
 interface SiderProps {
-    cbItems(items: any): void,
+    buckets: Array<string>,
+    handleSelected(bucket: string): void,
     collapse: boolean,
     onCollapseChange(e: any): void
 }
@@ -20,7 +21,6 @@ class Sider extends Component<SiderProps,any> {
         super(props);
         this.state = {
             current: '-1',
-            buckets: [],
             bucketsOnShow: []
         };
         this.handleFilter = this.handleFilter.bind(this);
@@ -32,41 +32,39 @@ class Sider extends Component<SiderProps,any> {
             current: e.key
         });
         const {bucketsOnShow} = this.state;
-        const {cbItems} = this.props;
-        ipcRenderer.send('list_file', bucketsOnShow[e.key]);
-        ipcRenderer.on('list_file-reply', (err, ret) => {
-            cbItems(ret.items);
-        })
+        const {handleSelected} = this.props;
+        handleSelected(bucketsOnShow[e.key])
     }
 
     handleFilter(keyword): void {
-        const {buckets} = this.state;
-        this.setState({
-            bucketsOnShow: buckets.filter(item=>
-                item.indexOf(keyword) !== -1
-            )
-        });
-    }
-
-    componentDidMount(): void {
-        ipcRenderer.send('buckets');
-        ipcRenderer.on('buckets-reply', (err, ret)=> {
+        const {buckets} = this.props;
+        if (buckets.length > 0) {
             this.setState({
-                buckets: ret,
-                bucketsOnShow: ret
+                bucketsOnShow: buckets.filter(item => item.indexOf(keyword) !== -1)
             });
-        })
+        }
     }
 
-    render(): JSX.Element {
+    componentWillReceiveProps(nextProps) {
+        const {buckets} = nextProps;
+        if (buckets.length > 0) {
+            this.setState({
+                bucketsOnShow: buckets
+            });
+        }
+    }
+
+    render() {
         const {bucketsOnShow} = this.state;
         const {collapse, onCollapseChange} = this.props;
         let subMenus = [];
         if (bucketsOnShow) {
             subMenus = bucketsOnShow.map((item, index)=>
                 <Menu.Item key={index}>
-                    {<span><Icon type="folder" className="menu-item-icon"/><span
-                        className="menu-item-text">{item}</span></span>}
+                    <span>
+                        <Icon type="folder" className="menu-item-icon"/>
+                        <span className="menu-item-text">{item}</span>
+                    </span>
                 </Menu.Item>
             );
         }
@@ -74,7 +72,7 @@ class Sider extends Component<SiderProps,any> {
             <div className={collapse ? "sider-collapse" : "sider-fixed"}>
                 <Menu
                     onClick={this.handleClick}
-                    defaultOpenKeys={['sub1']}
+                    defaultOpenKeys={['1']}
                     selectedKeys={[this.state.current]}
                     mode="inline"
                     theme="dark"

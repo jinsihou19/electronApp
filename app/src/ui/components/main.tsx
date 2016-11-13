@@ -9,7 +9,8 @@ import Component = React.Component;
 import {TableColumnConfig, TableRowSelection} from "antd/lib/table/Table";
 
 export interface MainProps {
-    data: any,
+    loading: boolean,
+    data: Array<any>,
     collapse: boolean
 }
 
@@ -41,7 +42,6 @@ class Main extends Component<MainProps, any> {
         super(props);
         this.state = {
             selectedRowKeys: [],  // 这里配置默认勾选列
-            loading: false
         };
         this.onSelectChange = this.onSelectChange.bind(this);
         this.solveSize = this.solveSize.bind(this);
@@ -50,7 +50,6 @@ class Main extends Component<MainProps, any> {
     componentWillReceiveProps(nextProps: MainProps): void {
         this.setState({
             selectedRowKeys: [],  // 这里配置默认勾选列
-            loading: false
         });
     }
 
@@ -70,8 +69,8 @@ class Main extends Component<MainProps, any> {
     }
 
     render(): JSX.Element {
-        let {data, collapse} = this.props;
-        const {loading, selectedRowKeys} = this.state;
+        let {data, collapse, loading} = this.props;
+        const {selectedRowKeys} = this.state;
         let that = this;
         const rowSelection: TableRowSelection<any> = {
             selectedRowKeys,
@@ -94,15 +93,15 @@ class Main extends Component<MainProps, any> {
                     <Button
                         type="primary"
                         disabled={!hasSelected}
-                        loading={loading}
                     >操作</Button>
                     <span style={{marginLeft: 8}}>{hasSelected ? `选择了 ${selectedRowKeys.length} 个对象` : ''}</span>
                 </div>
                 <Table
+                    loading={loading}
                     rowSelection={rowSelection}
                     columns={this.columns}
                     pagination={pagination}
-                    dataSource={data.map(item=> assign({}, item, {
+                    dataSource={data.map(item => assign(item, {
                                fsize: that.solveSize(item.fsize),
                                putTime: moment(new Date(item.putTime / 10000)).format('YYYY-MM-DD hh:mm:ss')
                            })

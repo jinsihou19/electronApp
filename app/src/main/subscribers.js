@@ -13,13 +13,13 @@ const subscribers = function () {
 
     ipcMain.on('buckets', e=> {
         buckets((err, ret)=> {
-            e.sender.send('buckets-reply', ret);
+            e.sender.send('buckets-res', ret);
         });
     });
 
     ipcMain.on('list_file', (e, bucket)=> {
         listPrefix(bucket, null, null, null, null, (err, ret)=> {
-            e.sender.send('list_file-reply', ret);
+            e.sender.send('list_file-res', ret);
         });
     });
 };

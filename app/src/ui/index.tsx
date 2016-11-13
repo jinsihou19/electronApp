@@ -5,7 +5,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import {Router, Route, IndexRoute, hashHistory} from 'react-router';
-import Content from './Content'
+import Content from './Content';
+import './res/style/index.scss';
 
 const AppUI: React.StatelessComponent<any> = () => {
     return <Router history={hashHistory}>

@@ -19,6 +19,9 @@ class SearchInput extends Component<SearchInputProps,any> {
             value: '',
             focus: false,
         };
+        this.handleInputChange = this.handleInputChange.bind(this);
+        this.handleFocusBlur = this.handleFocusBlur.bind(this);
+        this.handleSearch = this.handleSearch.bind(this);
     }
 
     handleInputChange(e): void {

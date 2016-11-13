@@ -5,8 +5,8 @@ const subscribers = require('./subscribers');
 app.on('ready', function () {
     var mainWindow = new BrowserWindow({
         titleBarStyle: 'hidden',
-        width: 800,
-        height: 600
+        width: 1000,
+        height: 800
     });
     mainWindow.on('closed', ()=> {
         mainWindow = null;
