@@ -47,7 +47,7 @@
     "electron": "latest",
     "menubar": "^4.1.1",
     "moment": "^2.14.1",
-    "mongoose": "^4.5.0",
+    "mongoose": "^5.7.6",
     "object-assign": "^4.1.0",
     "qiniu": "^6.1.11",
     "react": "^15.2.1",
