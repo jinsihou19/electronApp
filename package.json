@@ -15,7 +15,7 @@
   ],
   "homepage": "http://github.jinsihou19.io",
   "devDependencies": {
-    "electron": "^1.4.5",
+    "electron": "^9.1.0",
     "electron-builder": "latest",
     "electron-packager": "^8.2.0",
     "electron-prebuilt": "latest",
